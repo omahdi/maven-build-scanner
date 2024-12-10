@@ -20,7 +20,17 @@ public class Server {
 
   public static void main(String[] args) throws IOException {
     DiskDataStorage diskDataStorage = new DiskDataStorage();
-    HttpServer server = HttpServer.create(new InetSocketAddress(3000), 0);
+    String portEnv = System.getenv("APP_PORT");
+    int port = 3000;
+
+    if (portEnv != null && !portEnv.isEmpty()) {
+      try {
+        port = Integer.parseInt(portEnv);
+      } catch (NumberFormatException e) {
+        System.err.printf("Invalid APP_PORT value. Using default port %d.%n", port);
+      }
+    }
+    HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
     server.createContext(
         "/",
         t -> {
@@ -83,7 +93,7 @@ public class Server {
           }
         });
 
-    System.out.println("Open http://localhost:3000 to view build scan results");
+    System.out.printf("Open http://localhost:%d to view build scan results%n", port);
     server.start();
   }
 }
